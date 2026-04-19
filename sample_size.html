@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample Size Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .amiri { font-family: 'Amiri', serif; direction: ltr; }
+
+        body {
+            background: #0a0a0a;
+            color: #e5e5e5;
+            min-height: 100vh;
+        }
+
+        .gold-text {
+            background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card-dark {
+            background: linear-gradient(145deg, #111111 0%, #1a1a1a 100%);
+            border: 1px solid rgba(139, 0, 0, 0.3);
+        }
+
+        .explanation-box {
+            background: linear-gradient(135deg, #8B0000 0%, #660000 50%, #4a0000 100%);
+            border: 2px solid #a50000;
+            box-shadow: 0 4px 20px rgba(139, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .input-dark {
+            background: #0a0a0a;
+            border: 1px solid rgba(139, 0, 0, 0.5);
+            color: #ffcccc;
+            transition: all 0.3s;
+        }
+
+        .input-dark:focus {
+            border-color: #8B0000;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.4);
+            outline: none;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #bf953f 0%, #b38728 100%);
+            color: #0a0a0a;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .btn-gold:hover {
+            box-shadow: 0 10px 30px rgba(191, 149, 63, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .formula-box {
+            background: rgba(139, 0, 0, 0.15);
+            border-right: 3px solid #8B0000;
+            border-left: 1px solid rgba(139, 0, 0, 0.3);
+            border-top: 1px solid rgba(139, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(139, 0, 0, 0.3);
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, rgba(139, 0, 0, 0.2) 0%, rgba(102, 0, 0, 0.1) 100%);
+            border: 2px solid #8B0000;
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.3);
+        }
+
+        .nav-link {
+            color: #ff6b6b;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #ff9999;
+            transform: translateX(-5px);
+        }
+
+        .example-box {
+            background: linear-gradient(135deg, #4a0000 0%, #330000 100%);
+            border: 1px solid #8B0000;
+        }
+
+        .mono { font-family: 'Amiri', serif; direction: ltr; font-weight: bold; }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #8B0000, #660000);
+            border-radius: 4px;
+        }
+    </style>
+<base target="_self">
+</head>
+<body class="p-4">
+
+    <div class="container mx-auto max-w-4xl">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <a href="Homepage.html" class="nav-link flex items-center gap-2 text-lg">
+                <i class="fas fa-arrow-right"></i>
+                <span>Home</span>
+            </a>
+            <div class="text-center">
+                <h1 class="text-2xl font-bold gold-text">Sample Size Calculation</h1>
+                <p class="text-sm text-gray-500">Sample Size Determination</p>
+            </div>
+            <div class="w-24"></div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="card-dark rounded-2xl p-8 shadow-2xl">
+
+            <!-- Conditions -->
+            <div class="explanation-box rounded-xl p-6 mb-6">
+                <h3 class="text-red-100 font-bold mb-3 flex items-center gap-2">
+                    <i class="fas fa-info-circle text-red-300"></i>
+                    Purpose of this calculator
+                </h3>
+                <p class="text-red-100/90">
+                    Determine required sample size (<span class="amiri font-bold">n</span>) to achieve specified confidence level 
+                    with predefined margin of error.
+                </p>
+            </div>
+
+            <!-- Formula Section -->
+            <div class="formula-box rounded-xl p-6 mb-8">
+                <h3 class="text-red-400 font-bold mb-4">General Formula:</h3>
+                <div class="text-center text-xl amiri text-red-100 font-bold mb-4">
+                    n = (Z<sub>α/2</sub> × σ / e)²
+                </div>
+                <div class="grid md:grid-cols-2 gap-6 text-sm">
+                    <div class="bg-black/30 rounded-lg p-3 text-center">
+                        <span class="text-gray-400">e =</span> <span class="font-bold text-red-200">Allowable margin of error</span>
+                    </div>
+                    <div class="bg-black/30 rounded-lg p-3 text-center">
+                        <span class="text-gray-400">σ =</span> <span class="font-bold text-red-200">Standard deviation</span> (estimated)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculator -->
+            <div class="bg-black/30 rounded-xl p-6 border border-red-900/30">
+                <h3 class="text-red-400 font-bold mb-6 flex items-center gap-2">
+                    <i class="fas fa-calculator"></i>
+                    Calculator
+                </h3>
+
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2 text-sm">Standard deviation (σ)</label>
+                        <input type="number" id="sigma" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="0.3">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2 text-sm">Margin of error (e)</label>
+                        <input type="number" id="error" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="0.05" step="0.01">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2 text-sm">Confidence level</label>
+                        <select id="confidence" class="input-dark w-full p-4 rounded-xl text-lg">
+                            <option value="1.96">95% (Z = 1.96)</option>
+                            <option value="2.576">99% (Z = 2.576)</option>
+                            <option value="1.645">90% (Z = 1.645)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button onclick="calculate()" class="btn-gold py-4 px-8 rounded-xl w-full md:w-auto flex items-center gap-2 justify-center">
+                    <i class="fas fa-play"></i>
+                    <span>Calculate Sample Size</span>
+                </button>
+
+                <!-- Result -->
+                <div id="result" class="hidden mt-6">
+                    <div class="result-box rounded-xl p-6">
+                        <h4 class="text-red-300 font-bold mb-4 text-lg">Required Sample Size:</h4>
+                        <div class="text-center">
+                            <div class="text-4xl amiri font-bold text-gray-200 mb-2">
+                                n = <span id="n-result" class="text-red-400"></span>
+                            </div>
+                            <div class="text-gray-500 mt-3 text-sm">
+                                Calculation: (<span id="z-display" class="amiri text-red-400"></span> × <span id="sigma-display" class="amiri text-red-400"></span> / <span id="e-display" class="amiri text-red-400"></span>)² = <span id="raw-result" class="amiri text-red-400"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example -->
+            <div class="example-box rounded-xl p-6 mt-8">
+                <h3 class="text-red-200 font-bold mb-3">
+                    <i class="fas fa-lightbulb ml-2 text-red-300"></i>
+                    Application Example
+                </h3>
+                <p class="text-red-100/80 text-sm mb-3">
+                    Mean and standard deviation of quality points were 2.6 and 0.3 respectively. 
+                    What sample size is required for 95% confidence with error less than 0.05?
+                </p>
+                <div class="bg-black/40 rounded-lg p-4 amiri text-red-100 text-sm">
+                    n = (1.96 × 0.3 / 0.05)² = (11.76)² = 138.3 ≈ <span class="font-bold">139</span>
+                </div>
+            </div>
+
+            <!-- Additional Info -->
+            <div class="mt-6 bg-black/30 rounded-xl p-6 border border-red-900/30">
+                <h4 class="text-red-200 font-bold mb-3">Tips:</h4>
+                <ul class="text-gray-400 space-y-2 text-sm mr-5 list-disc">
+                    <li>If σ unknown, use conservative estimate or value from similar studies</li>
+                    <li>For proportions, use P = 0.5 for maximum variance (largest sample size)</li>
+                    <li>Always round up the result to ensure sufficient sample size</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="container mx-auto px-4 py-8 text-center mt-8">
+        <p class="text-gray-600 text-sm">HUE Horus University - Advanced Statistics</p>
+    </footer>
+
+    <script>
+        function calculate() {
+            const sigma = parseFloat(document.getElementById('sigma').value);
+            const e = parseFloat(document.getElementById('error').value);
+            const z = parseFloat(document.getElementById('confidence').value);
+
+            if (!sigma || !e) {
+                alert('Please enter standard deviation and margin of error');
+                return;
+            }
+
+            if (e <= 0) {
+                alert('Margin of error must be greater than zero');
+                return;
+            }
+
+            const rawResult = Math.pow((z * sigma) / e, 2);
+            const n = Math.ceil(rawResult);
+
+            document.getElementById('n-result').textContent = n;
+            document.getElementById('z-display').textContent = z.toFixed(2);
+            document.getElementById('sigma-display').textContent = sigma;
+            document.getElementById('e-display').textContent = e;
+            document.getElementById('raw-result').textContent = rawResult.toFixed(2);
+            document.getElementById('result').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confidence Interval for Mean - t-test (Small Sample)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .amiri { font-family: 'Amiri', serif; direction: ltr; }
+
+        body {
+            background: #0a0a0a;
+            color: #e5e5e5;
+            min-height: 100vh;
+        }
+
+        .gold-text {
+            background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card-dark {
+            background: linear-gradient(145deg, #111111 0%, #1a1a1a 100%);
+            border: 1px solid rgba(139, 0, 0, 0.3);
+        }
+
+        .explanation-box {
+            background: linear-gradient(135deg, #8B0000 0%, #660000 50%, #4a0000 100%);
+            border: 2px solid #a50000;
+            box-shadow: 0 4px 20px rgba(139, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .input-dark {
+            background: #0a0a0a;
+            border: 1px solid rgba(139, 0, 0, 0.5);
+            color: #ffcccc;
+            transition: all 0.3s;
+        }
+
+        .input-dark:focus {
+            border-color: #8B0000;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.4);
+            outline: none;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #bf953f 0%, #b38728 100%);
+            color: #0a0a0a;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .btn-gold:hover {
+            box-shadow: 0 10px 30px rgba(191, 149, 63, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .formula-box {
+            background: rgba(139, 0, 0, 0.15);
+            border-right: 3px solid #8B0000;
+            border-left: 1px solid rgba(139, 0, 0, 0.3);
+            border-top: 1px solid rgba(139, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(139, 0, 0, 0.3);
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, rgba(139, 0, 0, 0.2) 0%, rgba(102, 0, 0, 0.1) 100%);
+            border: 2px solid #8B0000;
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.3);
+        }
+
+        .nav-link {
+            color: #ff6b6b;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #ff9999;
+            transform: translateX(-5px);
+        }
+
+        .t-table {
+            background: rgba(234, 51, 51, 0.1);
+            border: 1px solid rgba(139, 0, 0, 0.3);
+        }
+
+        .t-table h3 {
+            color: #ff6b6b;
+        }
+
+        .t-table thead {
+            background: rgba(139, 0, 0, 0.3);
+        }
+
+        .t-table th {
+            color: #ff9999;
+        }
+
+        .example-box {
+            background: linear-gradient(135deg, #4a0000 0%, #330000 100%);
+            border: 1px solid #8B0000;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #8B0000, #660000);
+            border-radius: 4px;
+        }
+    </style>
+<base target="_self">
+</head>
+<body class="p-4">
+
+    <div class="container mx-auto max-w-4xl">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <a href="Homepage.html" class="nav-link flex items-center gap-2 text-lg">
+                <i class="fas fa-arrow-right"></i>
+                <span>Home</span>
+            </a>
+            <div class="text-center">
+                <h1 class="text-2xl font-bold gold-text">Confidence Interval for Mean</h1>
+                <p class="text-sm text-gray-500">t-Student | Small Sample (n < 30)</p>
+            </div>
+            <div class="w-24"></div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="card-dark rounded-2xl p-8 shadow-2xl">
+
+            <!-- Conditions -->
+            <div class="explanation-box rounded-xl p-6 mb-6">
+                <h3 class="text-red-100 font-bold mb-3 flex items-center gap-2">
+                    <i class="fas fa-info-circle text-red-300"></i>
+                    Conditions for using this formula
+                </h3>
+                <ul class="text-red-100/90 space-y-2 mr-5 list-disc text-sm">
+                    <li>Population approximately normal</li>
+                    <li>Sample size <span class="amiri font-bold text-red-200">n < 30</span> (small sample)</li>
+                    <li>Population variance <span class="amiri font-bold text-red-200">σ²</span> unknown</li>
+                    <li>Use <span class="font-bold text-red-200">t-Student</span> distribution instead of Z</li>
+                    <li>Degrees of freedom = <span class="amiri font-bold text-red-200">n - 1</span></li>
+                </ul>
+            </div>
+
+            <!-- Formula Section -->
+            <div class="formula-box rounded-xl p-6 mb-8">
+                <h3 class="text-red-400 font-bold mb-4">General Formula:</h3>
+                <div class="text-center text-xl amiri text-red-100 font-bold mb-4">
+                    X̄ ± t<sub>(α/2, n-1)</sub> × S/√n
+                </div>
+                <div class="bg-black/30 rounded-lg p-3 text-center text-gray-400 text-sm">
+                    Degrees of freedom (df) = <span class="amiri font-bold text-red-200">n - 1</span>
+                </div>
+            </div>
+
+            <!-- t-table Reference -->
+            <div class="t-table rounded-xl p-6 mb-6">
+                <h3 class="font-bold mb-4 flex items-center gap-2">
+                    <i class="fas fa-table"></i>
+                    Common t values (α = 0.05, two-tailed)
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr>
+                                <th class="p-3 text-left rounded-r-lg">Degrees of Freedom (df)</th>
+                                <th class="p-3 text-left">t<sub>0.025</sub></th>
+                                <th class="p-3 text-left rounded-l-lg">t<sub>0.01</sub> (99%)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-center text-gray-400">
+                            <tr class="border-b"><td class="p-2">9</td><td class="amiri font-bold">2.262</td><td class="amiri">3.250</td></tr>
+                            <tr class="border-b"><td class="p-2">11</td><td class="amiri font-bold">2.201</td><td class="amiri">3.106</td></tr>
+                            <tr class="border-b"><td class="p-2">19</td><td class="amiri font-bold">2.093</td><td class="amiri">2.861</td></tr>
+                            <tr class="border-b"><td class="p-2">29</td><td class="amiri font-bold">2.045</td><td class="amiri">2.756</td></tr>
+                            <tr><td class="p-2">∞ (Z)</td><td class="amiri font-bold">1.96</td><td class="amiri">2.576</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Calculator -->
+            <div class="bg-black/30 rounded-xl p-6 border border-red-900/30">
+                <h3 class="text-red-400 font-bold mb-6 flex items-center gap-2">
+                    <i class="fas fa-calculator"></i>
+                    Calculator
+                </h3>
+
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2 text-sm">Sample mean (X̄)</label>
+                        <input type="number" id="xbar" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="7.38">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2 text-sm">Standard deviation (S)</label>
+                        <input type="number" id="s" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="1.24">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2 text-sm">Sample size (n)</label>
+                        <input type="number" id="n" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="12">
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2 text-sm">t value</label>
+                        <input type="number" id="t" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="2.201" step="0.001">
+                        <p class="text-xs text-gray-500 mt-1">From table above based on df</p>
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2 text-sm">Degrees of Freedom (df = n-1)</label>
+                        <input type="number" id="df" class="input-dark w-full p-4 rounded-xl text-lg amiri bg-black/50" readonly placeholder="Auto calculated">
+                    </div>
+                </div>
+
+                <button onclick="calculate()" class="btn-gold py-4 px-8 rounded-xl w-full md:w-auto flex items-center gap-2 justify-center">
+                    <i class="fas fa-play"></i>
+                    <span>Calculate Interval</span>
+                </button>
+
+                <!-- Result -->
+                <div id="result" class="hidden mt-6">
+                    <div class="result-box rounded-xl p-6">
+                        <h4 class="text-red-300 font-bold mb-4 text-lg">Result:</h4>
+                        <div class="text-center">
+                            <div class="text-2xl amiri font-bold text-gray-200 mb-2">
+                                <span id="lower" class="text-red-400"></span>
+                                <span class="text-gray-500 mx-2">< μ <</span>
+                                <span id="upper" class="text-red-400"></span>
+                            </div>
+                            <div class="text-gray-500 mt-3 text-sm">
+                                Margin of error = <span id="me" class="amiri text-red-400 font-bold"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example -->
+            <div class="example-box rounded-xl p-6 mt-8">
+                <h3 class="text-red-200 font-bold mb-3">
+                    <i class="fas fa-lightbulb ml-2 text-red-300"></i>
+                    Application Example
+                </h3>
+                <p class="text-red-100/80 text-sm mb-3">
+                    Sample of 12 cotton yarn strength measurements gave mean 7.38 and std dev 1.24. 
+                    95% confidence interval (t<sub>0.025,11</sub> = 2.201):
+                </p>
+                <div class="bg-black/40 rounded-lg p-4 amiri text-red-100 text-sm">
+                    7.38 ± 2.201 × 1.24/√12 = 7.38 ± 0.787<br>
+                    6.51 < μ < 8.25
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="container mx-auto px-4 py-8 text-center mt-8">
+        <p class="text-gray-600 text-sm">HUE Horus University - Advanced Statistics</p>
+    </footer>
+
+    <script>
+        document.getElementById('n').addEventListener('input', function() {
+            const n = parseInt(this.value);
+            if (n) {
+                document.getElementById('df').value = n - 1;
+            }
+        });
+
+        function calculate() {
+            const xbar = parseFloat(document.getElementById('xbar').value);
+            const s = parseFloat(document.getElementById('s').value);
+            const n = parseFloat(document.getElementById('n').value);
+            const t = parseFloat(document.getElementById('t').value);
+
+            if (!xbar || !s || !n || !t) {
+                alert('Please enter all required values');
+                return;
+            }
+
+            if (n >= 30) {
+                alert('Note: Sample size ≥ 30. You can use Z distribution on previous page');
+            }
+
+            const me = t * (s / Math.sqrt(n));
+            const lower = xbar - me;
+            const upper = xbar + me;
+
+            document.getElementById('lower').textContent = lower.toFixed(4);
+            document.getElementById('upper').textContent = upper.toFixed(4);
+            document.getElementById('me').textContent = me.toFixed(4);
+            document.getElementById('result').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

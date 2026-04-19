@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فترة الثقة للمتوسط - التباين معلوم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { font-family: 'Cairo', sans-serif; }
+        .amiri { font-family: 'Amiri', serif; direction: ltr; }
+
+        body {
+            background: #0a0a0a;
+            color: #e5e5e5;
+            min-height: 100vh;
+        }
+
+        .gold-text {
+            background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card-dark {
+            background: linear-gradient(145deg, #111111 0%, #1a1a1a 100%);
+            border: 1px solid rgba(139, 0, 0, 0.3);
+        }
+
+        /* Blood Red Explanation Box - Unified Design */
+        .explanation-box {
+            background: linear-gradient(135deg, #8B0000 0%, #660000 50%, #4a0000 100%);
+            border: 2px solid #a50000;
+            box-shadow: 0 4px 20px rgba(139, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .input-dark {
+            background: #0a0a0a;
+            border: 1px solid rgba(139, 0, 0, 0.5);
+            color: #ffcccc;
+            transition: all 0.3s;
+        }
+
+        .input-dark:focus {
+            border-color: #8B0000;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.4);
+            outline: none;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #bf953f 0%, #b38728 100%);
+            color: #0a0a0a;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .btn-gold:hover {
+            box-shadow: 0 10px 30px rgba(191, 149, 63, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .formula-box {
+            background: rgba(139, 0, 0, 0.15);
+            border-right: 3px solid #8B0000;
+            border-left: 1px solid rgba(139, 0, 0, 0.3);
+            border-top: 1px solid rgba(139, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(139, 0, 0, 0.3);
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, rgba(139, 0, 0, 0.2) 0%, rgba(102, 0, 0, 0.1) 100%);
+            border: 2px solid #8B0000;
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.3);
+        }
+
+        .nav-link {
+            color: #ff6b6b;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #ff9999;
+            transform: translateX(-5px);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #8B0000, #660000);
+            border-radius: 4px;
+        }
+
+        .example-box {
+            background: linear-gradient(135deg, #4a0000 0%, #330000 100%);
+            border: 1px solid #8B0000;
+        }
+    </style>
+<base target="_self">
+</head>
+<body class="p-4">
+
+    <div class="container mx-auto max-w-4xl">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8" >
+            <a href="Homepage.html" class="nav-link flex items-center gap-2 text-lg" >
+                <i class="fas fa-arrow-right"></i>
+                <span>الرئيسية</span>
+            </a>
+            <div class="text-center">
+                <h1 class="text-2xl font-bold gold-text">فترة الثقة للمتوسط</h1>
+                <p class="text-sm text-gray-500">التباين معلوم | Known Variance</p>
+            </div>
+            <div class="w-24"></div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="card-dark rounded-2xl p-8 shadow-2xl">
+
+            <!-- Conditions - Blood Red Explanation Box -->
+            <div class="explanation-box rounded-xl p-6 mb-6">
+                <h3 class="text-red-100 font-bold mb-3 flex items-center gap-2">
+                    <i class="fas fa-info-circle text-red-300"></i>
+                    شروط استخدام هذا القانون
+                </h3>
+                <ul class="text-red-100/90 space-y-2 mr-5 list-disc text-sm">
+                    <li>المجتمع يتبع التوزيع الطبيعي، أو حجم العينة <span class="amiri font-bold text-red-200">n ≥ 30</span></li>
+                    <li>التباين السكاني <span class="amiri font-bold text-red-200">σ²</span> معلوم</li>
+                    <li>نستخدم توزيع Z الطبيعي</li>
+                </ul>
+            </div>
+
+            <!-- Formula Section -->
+            <div class="formula-box rounded-xl p-6 mb-8">
+                <h3 class="text-red-400 font-bold mb-4">القانون العام:</h3>
+                <div class="text-center text-xl amiri text-red-100 font-bold mb-4">
+                    X̄ ± Z<sub>α/2</sub> × σ/√n
+                </div>
+                <div class="text-center text-gray-500 text-sm">
+                    حيث <span class="amiri text-red-400">Z<sub>0.025</sub> = 1.96</span> للثقة 95%
+                </div>
+            </div>
+
+            <!-- Calculator -->
+            <div class="bg-black/30 rounded-xl p-6 border border-red-900/30">
+                <h3 class="text-red-400 font-bold mb-6 flex items-center gap-2">
+                    <i class="fas fa-calculator"></i>
+                    الآلة الحاسبة
+                </h3>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2 text-sm">متوسط العينة (X̄)</label>
+                        <input type="number" id="xbar" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="15">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2 text-sm">الانحراف المعياري (σ)</label>
+                        <input type="number" id="sigma" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="4">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2 text-sm">حجم العينة (n)</label>
+                        <input type="number" id="n" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="25">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 font-bold mb-2 text-sm">مستوى الثقة</label>
+                        <select id="confidence" class="input-dark w-full p-4 rounded-xl text-lg">
+                            <option value="1.96">95% (Z = 1.96)</option>
+                            <option value="2.576">99% (Z = 2.576)</option>
+                            <option value="1.645">90% (Z = 1.645)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button onclick="calculate()" class="btn-gold py-4 px-8 rounded-xl w-full md:w-auto flex items-center gap-2 justify-center">
+                    <i class="fas fa-play"></i>
+                    <span>احسب الفترة</span>
+                </button>
+
+                <!-- Result -->
+                <div id="result" class="hidden mt-6">
+                    <div class="result-box rounded-xl p-6">
+                        <h4 class="text-red-300 font-bold mb-4 text-lg">النتيجة:</h4>
+                        <div class="text-center">
+                            <div class="text-2xl amiri font-bold text-gray-200 mb-2">
+                                <span id="lower" class="text-red-400"></span>
+                                <span class="text-gray-500 mx-2">&lt; μ &lt;</span>
+                                <span id="upper" class="text-red-400"></span>
+                            </div>
+                            <div class="text-gray-500 mt-3 text-sm">
+                                هامش الخطأ (ME) = <span id="me" class="amiri text-red-400 font-bold"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example - Blood Red Box -->
+            <div class="example-box rounded-xl p-6 mt-8">
+                <h3 class="text-red-200 font-bold mb-3">
+                    <i class="fas fa-lightbulb ml-2 text-red-300"></i>
+                    مثال تطبيقي
+                </h3>
+                <p class="text-red-100/80 text-sm mb-3">
+                    عينة حجمها n=25 من مجتمع طبيعي ذو تباين معلوم σ²=16 (σ=4). إذا كان متوسط العينة X̄=15، 
+                    فإن فترة الثقة 95% للمتوسط μ هي:
+                </p>
+                <div class="bg-black/40 rounded-lg p-4 amiri text-red-100 text-sm">
+                    15 ± 1.96 × 4/5 = 15 ± 1.568<br>
+                    13.43 < μ < 16.57
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="container mx-auto px-4 py-8 text-center mt-8">
+        <p class="text-gray-600 text-sm">HUE Horus University - Advanced Statistics</p>
+    </footer>
+
+    <script>
+        function calculate() {
+            const xbar = parseFloat(document.getElementById('xbar').value);
+            const sigma = parseFloat(document.getElementById('sigma').value);
+            const n = parseFloat(document.getElementById('n').value);
+            const z = parseFloat(document.getElementById('confidence').value);
+
+            if (!xbar || !sigma || !n) {
+                alert('الرجاء إدخال جميع القيم المطلوبة');
+                return;
+            }
+
+            const me = z * (sigma / Math.sqrt(n));
+            const lower = xbar - me;
+            const upper = xbar + me;
+
+            document.getElementById('lower').textContent = lower.toFixed(4);
+            document.getElementById('upper').textContent = upper.toFixed(4);
+            document.getElementById('me').textContent = me.toFixed(4);
+            document.getElementById('result').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

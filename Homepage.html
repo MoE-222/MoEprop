@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics Laws</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .formula { font-family: 'Amiri', serif; direction: ltr; }
+
+        body {
+            background: #0a0a0a;
+            color: #e5e5e5;
+            overflow-x: hidden;
+        }
+
+        /* Red gradient text */
+        .gold-text {
+            background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .red-border {
+            border: 2px solid transparent;
+            background: linear-gradient(#0a0a0a, #0a0a0a) padding-box,
+                        linear-gradient(135deg, #8B0000, #ff6b6b) border-box;
+        }
+
+        .red-glow {
+            box-shadow: 0 0 30px rgba(139, 0, 0, 0.3), 
+                        0 0 60px rgba(139, 0, 0, 0.1);
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0a 70%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(139, 0, 0, 0.03) 10px,
+                rgba(139, 0, 0, 0.03) 20px
+            );
+            animation: backgroundMove 20s linear infinite;
+        }
+
+        @keyframes backgroundMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            background: radial-gradient(circle, #8B0000 0%, transparent 70%);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.5; }
+            50% { transform: translateY(-20px) scale(1.2); opacity: 0.8; }
+        }
+
+        /* Law Cards */
+        .law-card {
+            background: linear-gradient(145deg, #111111 0%, #1a1a1a 100%);
+            border: 1px solid rgba(139, 0, 0, 0.2);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .law-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(139, 0, 0, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .law-card:hover::before {
+            left: 100%;
+        }
+
+        .law-card:hover {
+            border-color: rgba(139, 0, 0, 0.6);
+            box-shadow: 0 20px 40px rgba(139, 0, 0, 0.2),
+                        0 0 0 1px rgba(139, 0, 0, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .law-number {
+            background: linear-gradient(135deg, #8B0000, #660000);
+            color: white;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(139, 0, 0, 0.4);
+        }
+
+        /* Formula styling */
+        .formula {
+            background: rgba(139, 0, 0, 0.15);
+            border-right: 3px solid #8B0000;
+            font-family: 'Amiri', serif;
+            direction: ltr;
+            text-align: center;
+        }
+
+        /* Zoom transition overlay */
+        .zoom-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            z-index: 9999;
+            transform: scale(0);
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zoom-overlay.active {
+            transform: scale(1);
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .zoom-content {
+            text-align: center;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(139, 0, 0, 0.3);
+            border-top-color: #8B0000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Scroll animations */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease-out;
+        }
+
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #8B0000, #660000);
+            border-radius: 5px;
+        }
+
+        /* Button styling */
+        .red-btn {
+            background: linear-gradient(135deg, #8B0000 0%, #660000 100%);
+            color: white;
+            font-weight: 700;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .red-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .red-btn:hover::before {
+            left: 100%;
+        }
+
+        .red-btn:hover {
+            box-shadow: 0 10px 30px rgba(139, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Section divider */
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #8B0000, transparent);
+            margin: 4rem 0;
+        }
+    </style>
+<base target="_self">
+</head>
+<body>
+
+    <!-- Zoom Transition Overlay -->
+    <div id="zoomOverlay" class="zoom-overlay">
+        <div class="zoom-content">
+            <div class="spinner mb-4 mx-auto"></div>
+            <p class="text-xl font-bold">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <!-- Floating particles -->
+        <div class="particle" style="width: 100px; height: 100px; top: 10%; left: 10%; animation-delay: 0s;"></div>
+        <div class="particle" style="width: 60px; height: 60px; top: 70%; left: 80%; animation-delay: 2s;"></div>
+        <div class="particle" style="width: 80px; height: 80px; top: 40%; left: 85%; animation-delay: 4s;"></div>
+        <div class="particle" style="width: 40px; height: 40px; top: 80%; left: 20%; animation-delay: 1s;"></div>
+
+        <div class="text-center z-10 px-4">
+            <div class="mb-6">
+                <i class="fas fa-infinity text-6xl text-red-600 opacity-80"></i>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-black mb-4 gold-text tracking-wide">
+                Statistics Laws
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-400 mb-2 font-light">
+                Statistics & Probability Laws
+            </p>
+            <p class="text-sm text-gray-500 mb-8">
+                HUE Horus University - Dr/ Mohamed E. Sobh
+            </p>
+
+            <!-- Decorative line -->
+            <div class="flex items-center justify-center gap-4 mb-8">
+                <div class="h-px w-20 bg-gradient-to-r from-transparent to-red-600"></div>
+                <i class="fas fa-crown text-red-600"></i>
+                <div class="h-px w-20 bg-gradient-to-l from-transparent to-red-600"></div>
+            </div>
+
+            <p class="text-gray-400 max-w-2xl mx-auto mb-12 text-lg leading-relaxed">
+                Your complete guide to understanding and applying probability and statistics laws with interactive calculators for each law
+            </p>
+
+            <button onclick="scrollToLaws()" class="red-btn px-8 py-4 rounded-full text-lg flex items-center gap-3 mx-auto group">
+                <span>Explore Laws</span>
+                <i class="fas fa-arrow-down group-hover:translate-y-1 transition-transform"></i>
+            </button>
+        </div>
+
+        <!-- Scroll indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <i class="fas fa-chevron-down text-red-600 text-2xl"></i>
+        </div>
+    </section>
+
+    <!-- Laws Section -->
+    <section id="lawsSection" class="container mx-auto px-4 py-16 max-w-5xl">
+
+        <div class="text-center mb-16 scroll-reveal">
+            <h2 class="text-4xl font-bold gold-text mb-4">The Six Essential Laws</h2>
+            <p class="text-gray-400">Choose any law to access its interactive page</p>
+        </div>
+
+        <!-- Law 1: Mean Known Variance -->
+        <div class="law-card rounded-2xl p-8 mb-8 scroll-reveal cursor-pointer" onclick="navigateTo('mean_known.html')">
+            <div class="flex items-start gap-6">
+                <div class="law-number shrink-0">1</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold gold-text mb-3">Confidence Interval for Mean</h3>
+                    <p class="text-red-600/80 text-sm mb-4 font-semibold">Known Variance</p>
+
+                    <div class="formula rounded-lg p-4 mb-4 text-lg text-red-100">
+                        X̄ ± Z<sub>α/2</sub> × σ/√n
+                    </div>
+
+                    <div class="text-gray-400 text-sm leading-relaxed mb-4">
+                        <strong class="text-red-500">Explanation:</strong> Use this formula when population variance (σ²) is known 
+                        and population is normal, or sample size is large (n ≥ 30). 
+                        Uses standard normal Z distribution.
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs border border-red-500/30">σ² known</span>
+                        <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs border border-red-500/30">Normal distribution</span>
+                        <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs border border-red-500/30">Z-Score</span>
+                    </div>
+
+                    <div class="flex items-center text-red-600 gap-2 text-sm font-bold group">
+                        <span>Open Calculator</span>
+                        <i class="fas fa-arrow-right transform group-hover:translate-x-2 transition-transform"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider scroll-reveal"></div>
+
+        <!-- Law 2: Mean Unknown Large -->
+        <div class="law-card rounded-2xl p-8 mb-8 scroll-reveal cursor-pointer" onclick="navigateTo('mean_unknown_large.html')">
+            <div class="flex items-start gap-6">
+                <div class="law-number shrink-0">2</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold gold-text mb-3">Confidence Interval for Mean</h3>
+                    <p class="text-red-600/80 text-sm mb-4 font-semibold">Unknown Variance - Large Sample | n ≥ 30</p>
+
+                    <div class="formula rounded-lg p-4 mb-4 text-lg text-red-100">
+                        X̄ ± Z<sub>α/2</sub> × S/√n
+                    </div>
+
+                    <div class="text-gray-400 text-sm leading-relaxed mb-4">
+                        <strong class="text-red-500">Explanation:</strong> When variance is unknown but sample size is large (n ≥ 30), 
+                        use sample standard deviation (S) instead of σ. By Central Limit Theorem, 
+                        we can still use Z distribution.
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs border border-red-500/30">σ² unknown</span>
+                        <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs border border-red-500/30">n ≥ 30</span>
+                        <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs border border-red-500/30">S (sample)</span>
+                    </div>
+
+                    <div class="flex items-center text-red-600 gap-2 text-sm font-bold group">
+                        <span>Open Calculator</span>
+                        <i class="fas fa-arrow-right transform group-hover:translate-x-2 transition-transform"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider scroll-reveal"></div>
+
+        <!-- Law 3: Mean Unknown Small (t-test) -->
+        <div class="law-card rounded-2xl p-8 mb-8 scroll-reveal cursor-pointer" onclick="navigateTo('mean_unknown_small.html')">
+            <div class="flex items-start gap-6">
+                <div class="law-number shrink-0">3</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold gold-text mb-3">Confidence Interval for Mean</h3>
+                    <p class="text-red-600/80 text-sm mb-4 font-semibold">t-Student | Small Sample n < 30</p>
+
+                    <div class="formula rounded-lg p-4 mb-4 text-lg text-red-100">
+                        X̄ ± t<sub>(α/2, n-1)</sub> × S/√n
+                    </div>
+
+                    <div class="text-gray-400 text-sm leading-relaxed mb-4">
+                        <strong class="text-red-500">Explanation:</strong> For small samples (n < 30) with unknown variance, 
+                        use t-Student distribution instead of Z. This distribution depends on degrees of freedom (df = n-1) 
+                        and accounts for uncertainty in variance estimation.
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs border border-red-500/30">n < 30</span>
+                        <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs border border-red-500/30">t-Student</span>
+                        <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs border border-red-500/30">df = n-1</span>
+                    </div>
+
+                    <div class="flex items-center text-red-600 gap-2 text-sm font-bold group">
+                        <span>Open Calculator</span>
+                        <i class="fas fa-arrow-right transform group-hover:translate-x-2 transition-transform"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider scroll-reveal"></div>
+
+        <!-- Law 4: Proportion -->
+        <div class="law-card rounded-2xl p-8 mb-8 scroll-reveal cursor-pointer" onclick="navigateTo('proportion.html')">
+            <div class="flex items-start gap-6">
+                <div class="law-number shrink-0">4</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold gold-text mb-3">Confidence Interval for Proportion</h3>
+                    <p class="text-red-600/80 text-sm mb-4 font-semibold">Population Proportion | P̂</p>
+
+                    <div class="formula rounded-lg p-4 mb-4 text-lg text-red-100">
+                        P̂ ± Z × √[P̂(1-P̂)/n]
+                    </div>
+
+                    <div class="text-gray-400 text-sm leading-relaxed mb-4">
+                        <strong class="text-red-500">Explanation:</strong> For calculating confidence interval for population proportion 
+                        (like voters proportion, satisfied customers). Uses normal approximation with condition 
+                        nP̂ ≥ 5 and n(1-P̂) ≥ 5.
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs border border-red-500/30">Binary data</span>
+                        <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs border border-red-500/30">P̂ = X/n</span>
+                        <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs border border-red-500/30">Normal approximation</span>
+                    </div>
+
+                    <div class="flex items-center text-red-600 gap-2 text-sm font-bold group">
+                        <span>Open Calculator</span>
+                        <i class="fas fa-arrow-right transform group-hover:translate-x-2 transition-transform"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider scroll-reveal"></div>
+
+        <!-- Law 5: Variance (Chi-Square) -->
+        <div class="law-card rounded-2xl p-8 mb-8 scroll-reveal cursor-pointer" onclick="navigateTo('variance.html')">
+            <div class="flex items-start gap-6">
+                <div class="law-number shrink-0">5</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold gold-text mb-3">Confidence Interval for Variance</h3>
+                    <p class="text-red-600/80 text-sm mb-4 font-semibold">Chi-Square Distribution | σ²</p>
+
+                    <div class="formula rounded-lg p-4 mb-4 text-lg text-red-100">
+                        [(n-1)S²/χ²<sub>α/2</sub>] < σ² < [(n-1)S²/χ²<sub>1-α/2</sub>]
+                    </div>
+
+                    <div class="text-gray-400 text-sm leading-relaxed mb-4">
+                        <strong class="text-red-500">Explanation:</strong> For calculating confidence interval for population variance (σ²) or 
+                        standard deviation (σ). Requires Chi-Square distribution and assumes normal population. 
+                        Interval is asymmetric around S².
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs border border-red-500/30">Chi-Square</span>
+                        <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs border border-red-500/30">Asymmetric interval</span>
+                        <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs border border-red-500/30">df = n-1</span>
+                    </div>
+
+                    <div class="flex items-center text-red-600 gap-2 text-sm font-bold group">
+                        <span>Open Calculator</span>
+                        <i class="fas fa-arrow-right transform group-hover:translate-x-2 transition-transform"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider scroll-reveal"></div>
+
+        <!-- Law 6: Sample Size -->
+        <div class="law-card rounded-2xl p-8 mb-8 scroll-reveal cursor-pointer" onclick="navigateTo('sample_size.html')">
+            <div class="flex items-start gap-6">
+                <div class="law-number shrink-0">6</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold gold-text mb-3">Sample Size Calculation</h3>
+                    <p class="text-red-600/80 text-sm mb-4 font-semibold">Sample Size Determination | n</p>
+
+                    <div class="formula rounded-lg p-4 mb-4 text-lg text-red-100">
+                        n = (Z × σ / e)²
+                    </div>
+
+                    <div class="text-gray-400 text-sm leading-relaxed mb-4">
+                        <strong class="text-red-500">Explanation:</strong> To determine required sample size before conducting study 
+                        to achieve certain confidence level with specified margin of error (e). Useful for research planning 
+                        and determining budget and resources needed.
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs border border-red-500/30">Prior planning</span>
+                        <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs border border-red-500/30">Margin of error</span>
+                        <span class="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-xs border border-red-500/30">Round up</span>
+                    </div>
+
+                    <div class="flex items-center text-red-600 gap-2 text-sm font-bold group">
+                        <span>Open Calculator</span>
+                        <i class="fas fa-arrow-right transform group-hover:translate-x-2 transition-transform"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Quick Reference Table -->
+    <section class="container mx-auto px-4 py-16 max-w-5xl">
+        <div class="red-border rounded-2xl p-8 scroll-reveal">
+            <h2 class="text-2xl font-bold gold-text mb-6 text-center">
+                <i class="fas fa-table ml-2"></i>
+                Quick Reference Values
+            </h2>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-red-600 font-bold mb-4">Common Z values</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center bg-white/5 rounded-lg p-3">
+                            <span class="text-gray-400">90% confidence</span>
+                            <span class="amiri text-red-500 font-bold">Z = 1.645</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-red-500/10 rounded-lg p-3 border border-red-500/30">
+                            <span class="text-gray-300">95% confidence</span>
+                            <span class="amiri text-red-400 font-bold text-lg">Z = 1.96</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-white/5 rounded-lg p-3">
+                            <span class="text-gray-400">99% confidence</span>
+                            <span class="amiri text-red-500 font-bold">Z = 2.576</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-red-600 font-bold mb-4">Common t values (95%)</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center bg-white/5 rounded-lg p-3">
+                            <span class="text-gray-400">df = 11</span>
+                            <span class="amiri text-red-500 font-bold">t = 2.201</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-white/5 rounded-lg p-3">
+                            <span class="text-gray-400">df = 19</span>
+                            <span class="amiri text-red-500 font-bold">t = 2.093</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-white/5 rounded-lg p-3">
+                            <span class="text-gray-400">df = 29</span>
+                            <span class="amiri text-red-500 font-bold">t = 2.045</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="container mx-auto px-4 py-12 text-center border-t border-red-900/30 mt-16">
+        <div class="gold-text text-2xl font-bold mb-4">
+            <i class="fas fa-infinity"></i>
+        </div>
+        <p class="text-gray-500 text-sm">
+            This website developed with AI assistance
+        </p>
+        <p class="text-gray-600 text-xs mt-2">
+            HUE Horus University - Egypt | Advanced Statistics
+        </p>
+    </footer>
+
+    <script>
+        // Scroll reveal animation
+        function reveal() {
+            var reveals = document.querySelectorAll('.scroll-reveal');
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add('revealed');
+                }
+            }
+        }
+
+        window.addEventListener('scroll', reveal);
+        reveal(); // Trigger once on load
+
+        // Smooth scroll to laws section
+        function scrollToLaws() {
+            document.getElementById('lawsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Zoom transition navigation
+        function navigateTo(page) {
+            const overlay = document.getElementById('zoomOverlay');
+            overlay.classList.add('active');
+
+            setTimeout(() => {
+                window.location.href = page;
+            }, 800);
+        }
+
+        // Add parallax effect to hero
+        document.addEventListener('mousemove', (e) => {
+            const particles = document.querySelectorAll('.particle');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+
+            particles.forEach((particle, index) => {
+                const speed = (index + 1) * 20;
+                particle.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+            });
+        });
+    </script>
+</body>
+</html>
