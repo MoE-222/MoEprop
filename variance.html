@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         * { font-family: 'Cairo', sans-serif; }
         .amiri { font-family: 'Amiri', serif; direction: ltr; }
@@ -107,7 +109,11 @@
             border: 1px solid #8B0000;
         }
 
-        .mono { font-family: 'Amiri', serif; direction: ltr; font-weight: bold; }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
 
         ::-webkit-scrollbar {
             width: 8px;
@@ -122,15 +128,13 @@
             border-radius: 4px;
         }
     </style>
-<base target="_self">
 </head>
 <body class="p-4">
 
     <div class="container mx-auto max-w-4xl">
         <!-- Header -->
         <div class="flex items-center justify-between mb-8">
-                <a href="Homepage.html" class="nav-link flex items-center gap-2 text-lg" >
-
+            <a href="Homepage.html" class="nav-link flex items-center gap-2 text-lg">
                 <i class="fas fa-arrow-right"></i>
                 <span>الرئيسية</span>
             </a>
@@ -205,27 +209,27 @@
                 <div class="grid md:grid-cols-2 gap-6 mb-6">
                     <div>
                         <label class="block text-gray-400 font-bold mb-2 text-sm">التباين العيني (S²)</label>
-                        <input type="number" id="s2" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="5.76">
+                        <input type="number" id="s2" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="5.76" step="any">
                     </div>
                     <div>
                         <label class="block text-gray-400 font-bold mb-2 text-sm">أو الانحراف المعياري (S)</label>
-                        <input type="number" id="s" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="2.4">
+                        <input type="number" id="s" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="2.4" step="any">
                     </div>
                 </div>
 
                 <div class="grid md:grid-cols-3 gap-6 mb-6">
                     <div>
                         <label class="block text-gray-400 font-bold mb-2 text-sm">حجم العينة (n)</label>
-                        <input type="number" id="n" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="30">
+                        <input type="number" id="n" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="30" step="1" min="2">
                     </div>
                     <div>
                         <label class="block text-gray-400 font-bold mb-2 text-sm">χ²<sub>α/2</sub> (الحد الأيمن)</label>
-                        <input type="number" id="chi-right" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="45.722" step="0.001">
+                        <input type="number" id="chi-right" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="45.722" step="any">
                         <p class="text-xs text-gray-500 mt-1">للحد الأدنى</p>
                     </div>
                     <div>
                         <label class="block text-gray-400 font-bold mb-2 text-sm">χ²<sub>1-α/2</sub> (الحد الأيسر)</label>
-                        <input type="number" id="chi-left" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="16.047" step="0.001">
+                        <input type="number" id="chi-left" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="16.047" step="any">
                         <p class="text-xs text-gray-500 mt-1">للحد الأقصى</p>
                     </div>
                 </div>
@@ -250,7 +254,33 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Graph Section -->
+                    <div class="mt-8 bg-black/50 rounded-xl p-6 border border-red-900/30">
+                        <h4 class="text-red-300 font-bold mb-4 flex items-center gap-2">
+                            <i class="fas fa-chart-line"></i>
+                            توزيع Chi-Square (df = <span id="chart-df"></span>)
+                        </h4>
+                        <div class="chart-container">
+                            <canvas id="ciChart"></canvas>
+                        </div>
+                        <div class="flex justify-center gap-6 mt-4 text-sm">
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 rounded" style="background: rgba(139, 0, 0, 0.6);"></div>
+                                <span class="text-gray-400">فترة الثقة</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 rounded" style="background: #ff6b6b;"></div>
+                                <span class="text-gray-400">منحنى Chi-Square</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-1" style="background: #ffd700;"></div>
+                                <span class="text-gray-400">التباين العيني S²</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
             </div>
 
             <!-- Example - Blood Red Box -->
@@ -279,16 +309,18 @@
     </footer>
 
     <script>
+        let ciChart = null;
+
         document.getElementById('s').addEventListener('input', function() {
             const s = parseFloat(this.value);
-            if (s) {
+            if (s && s > 0) {
                 document.getElementById('s2').value = (s * s).toFixed(4);
             }
         });
 
         document.getElementById('s2').addEventListener('input', function() {
             const s2 = parseFloat(this.value);
-            if (s2) {
+            if (s2 && s2 > 0) {
                 document.getElementById('s').value = Math.sqrt(s2).toFixed(4);
             }
         });
@@ -299,9 +331,28 @@
             const chiRight = parseFloat(document.getElementById('chi-right').value);
             const chiLeft = parseFloat(document.getElementById('chi-left').value);
 
-            if (!s2 || !n || !chiRight || !chiLeft) {
+            if (isNaN(s2) || isNaN(n) || isNaN(chiRight) || isNaN(chiLeft)) {
                 alert('الرجاء إدخال جميع القيم المطلوبة');
                 return;
+            }
+
+            if (n < 2) {
+                alert('حجم العينة يجب أن يكون على الأقل 2');
+                return;
+            }
+
+            if (s2 <= 0) {
+                alert('التباين يجب أن يكون أكبر من صفر');
+                return;
+            }
+
+            if (chiRight <= 0 || chiLeft <= 0) {
+                alert('قيم Chi-Square يجب أن تكون أكبر من صفر');
+                return;
+            }
+
+            if (chiRight <= chiLeft) {
+                alert('تحذير: القيمة اليمنى يجب أن تكون أكبر من اليسرى');
             }
 
             const df = n - 1;
@@ -314,8 +365,222 @@
             document.getElementById('upper').textContent = upperVar.toFixed(4);
             document.getElementById('lower-std').textContent = Math.sqrt(lowerVar).toFixed(4);
             document.getElementById('upper-std').textContent = Math.sqrt(upperVar).toFixed(4);
+            document.getElementById('chart-df').textContent = df;
             document.getElementById('result').classList.remove('hidden');
+
+            drawChart(s2, df, lowerVar, upperVar);
+        }
+
+        function gamma(z) {
+            // Lanczos approximation for Gamma function
+            const g = 7;
+            const C = [
+                0.99999999999980993,
+                676.5203681218851,
+                -1259.1392167224028,
+                771.32342877765313,
+                -176.61502916214059,
+                12.507343278686905,
+                -0.13857109526572012,
+                9.9843695780195716e-6,
+                1.5056327351493116e-7
+            ];
+            
+            if (z < 0.5) {
+                return Math.PI / (Math.sin(Math.PI * z) * gamma(1 - z));
+            }
+            
+            z -= 1;
+            let x = C[0];
+            for (let i = 1; i < g + 2; i++) {
+                x += C[i] / (z + i);
+            }
+            
+            const t = z + g + 0.5;
+            return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
+        }
+
+        function chiSquarePDF(x, df) {
+            if (x <= 0) return 0;
+            const k = df / 2;
+            const numerator = Math.pow(x, k - 1) * Math.exp(-x / 2);
+            const denominator = Math.pow(2, k) * gamma(k);
+            return numerator / denominator;
+        }
+
+        function drawChart(s2, df, lowerVar, upperVar) {
+            const ctx = document.getElementById('ciChart').getContext('2d');
+            
+            if (ciChart) {
+                ciChart.destroy();
+            }
+
+            // Chi-square is right-skewed, so extend range further to the right
+            const maxX = Math.max(upperVar * 1.8, df * 2.5, 10);
+            const minX = 0;
+            const points = 400;
+            const step = (maxX - minX) / points;
+
+            const labels = [];
+            const dataChi = [];
+            const dataCI = [];
+
+            for (let i = 0; i <= points; i++) {
+                const x = minX + i * step;
+                labels.push(x.toFixed(1));
+                
+                const y = chiSquarePDF(x, df);
+                dataChi.push(y);
+                
+                if (x >= lowerVar && x <= upperVar) {
+                    dataCI.push(y);
+                } else {
+                    dataCI.push(null);
+                }
+            }
+
+            ciChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'فترة الثقة',
+                            data: dataCI,
+                            borderColor: '#8B0000',
+                            backgroundColor: 'rgba(139, 0, 0, 0.5)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            borderWidth: 2,
+                            order: 2
+                        },
+                        {
+                            label: 'Chi-Square PDF',
+                            data: dataChi,
+                            borderColor: '#ff6b6b',
+                            backgroundColor: 'rgba(255, 107, 107, 0.05)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            borderWidth: 2,
+                            order: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ff6b6b',
+                            bodyColor: '#e5e5e5',
+                            borderColor: '#8B0000',
+                            borderWidth: 1,
+                            callbacks: {
+                                title: function(context) {
+                                    return 'σ² = ' + context[0].label;
+                                },
+                                label: function(context) {
+                                    if (context.datasetIndex === 0) {
+                                        return 'داخل فترة الثقة';
+                                    }
+                                    return 'الكثافة: ' + context.parsed.y.toFixed(4);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { 
+                                display: true, 
+                                text: 'σ² (التباين السكاني)', 
+                                color: '#e5e5e5',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            ticks: { 
+                                color: '#e5e5e5',
+                                maxTicksLimit: 12
+                            },
+                            grid: { 
+                                color: 'rgba(139, 0, 0, 0.1)' 
+                            }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'الكثافة الاحتمالية', 
+                                color: '#e5e5e5',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            ticks: { 
+                                color: '#e5e5e5' 
+                            },
+                            grid: { 
+                                color: 'rgba(139, 0, 0, 0.1)' 
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                },
+                plugins: [{
+                    afterDraw: function(chart) {
+                        const ctx = chart.ctx;
+                        const xAxis = chart.scales.x;
+                        const yAxis = chart.scales.y;
+                        
+                        // Draw S² line
+                        const xPixel = xAxis.getPixelForValue(s2.toFixed(1));
+                        if (xPixel >= xAxis.left && xPixel <= xAxis.right) {
+                            ctx.save();
+                            ctx.beginPath();
+                            ctx.moveTo(xPixel, yAxis.top);
+                            ctx.lineTo(xPixel, yAxis.bottom);
+                            ctx.lineWidth = 2;
+                            ctx.strokeStyle = '#ffd700';
+                            ctx.setLineDash([5, 5]);
+                            ctx.stroke();
+                            
+                            ctx.fillStyle = '#ffd700';
+                            ctx.font = 'bold 14px Cairo';
+                            ctx.textAlign = 'center';
+                            ctx.fillText('S² = ' + s2.toFixed(2), xPixel, yAxis.top - 10);
+                            ctx.restore();
+                        }
+                        
+                        // Draw boundary lines
+                        [lowerVar, upperVar].forEach(bound => {
+                            const xPix = xAxis.getPixelForValue(bound.toFixed(1));
+                            if (xPix >= xAxis.left && xPix <= xAxis.right) {
+                                ctx.save();
+                                ctx.beginPath();
+                                ctx.moveTo(xPix, yAxis.top);
+                                ctx.lineTo(xPix, yAxis.bottom);
+                                ctx.lineWidth = 2;
+                                ctx.strokeStyle = '#ff4444';
+                                ctx.setLineDash([3, 3]);
+                                ctx.stroke();
+                                
+                                ctx.fillStyle = '#ff4444';
+                                ctx.font = '12px Cairo';
+                                ctx.textAlign = 'center';
+                                ctx.fillText(bound.toFixed(2), xPix, yAxis.bottom + 20);
+                                ctx.restore();
+                            }
+                        });
+                    }
+                }]
+            });
         }
     </script>
+
 </body>
 </html>
