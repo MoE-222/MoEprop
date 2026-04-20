@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         .amiri { font-family: 'Amiri', serif; direction: ltr; }
@@ -101,8 +103,13 @@
             background: linear-gradient(135deg, #4a0000 0%, #330000 100%);
             border: 1px solid #8B0000;
         }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
     </style>
-<base target="_self">
 </head>
 <body class="p-4">
 
@@ -158,15 +165,15 @@
                 <div class="grid md:grid-cols-2 gap-6 mb-6">
                     <div>
                         <label class="block text-gray-400 font-bold mb-2 text-sm">Sample mean (X̄)</label>
-                        <input type="number" id="xbar" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="2.6">
+                        <input type="number" id="xbar" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="2.6" step="any">
                     </div>
                     <div>
                         <label class="block text-gray-400 font-bold mb-2 text-sm">Sample standard deviation (S)</label>
-                        <input type="number" id="s" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="0.3">
+                        <input type="number" id="s" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="0.3" step="any">
                     </div>
                     <div>
                         <label class="block text-gray-400 font-bold mb-2 text-sm">Sample size (n)</label>
-                        <input type="number" id="n" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="36">
+                        <input type="number" id="n" class="input-dark w-full p-4 rounded-xl text-lg amiri" placeholder="36" step="1">
                         <p class="text-xs text-gray-500 mt-1">Must be n ≥ 30</p>
                     </div>
                     <div>
@@ -199,7 +206,33 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Graph Section -->
+                    <div class="mt-8 bg-black/50 rounded-xl p-6 border border-red-900/30">
+                        <h4 class="text-red-300 font-bold mb-4 flex items-center gap-2">
+                            <i class="fas fa-chart-line"></i>
+                            Normal Distribution Visualization
+                        </h4>
+                        <div class="chart-container">
+                            <canvas id="ciChart"></canvas>
+                        </div>
+                        <div class="flex justify-center gap-6 mt-4 text-sm">
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 rounded" style="background: rgba(139, 0, 0, 0.6);"></div>
+                                <span class="text-gray-400">Confidence Interval</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 rounded" style="background: #ff6b6b;"></div>
+                                <span class="text-gray-400">Normal Distribution Curve</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-1" style="background: #ffd700;"></div>
+                                <span class="text-gray-400">Sample Mean</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
             </div>
 
             <!-- Example -->
@@ -226,14 +259,16 @@
     </footer>
 
     <script>
+        let ciChart = null;
+
         function calculate() {
             const xbar = parseFloat(document.getElementById('xbar').value);
             const s = parseFloat(document.getElementById('s').value);
             const n = parseFloat(document.getElementById('n').value);
             const z = parseFloat(document.getElementById('confidence').value);
 
-            if (!xbar || !s || !n) {
-                alert('Please enter all required values');
+            if (isNaN(xbar) || isNaN(s) || isNaN(n) || n <= 0 || s <= 0) {
+                alert('Please enter all required values correctly');
                 return;
             }
 
@@ -241,7 +276,8 @@
                 alert('Warning: Sample size < 30. Consider using t-distribution on previous page');
             }
 
-            const me = z * (s / Math.sqrt(n));
+            const se = s / Math.sqrt(n);
+            const me = z * se;
             const lower = xbar - me;
             const upper = xbar + me;
 
@@ -249,7 +285,184 @@
             document.getElementById('upper').textContent = upper.toFixed(4);
             document.getElementById('me').textContent = me.toFixed(4);
             document.getElementById('result').classList.remove('hidden');
+
+            drawChart(xbar, se, lower, upper);
+        }
+
+        function drawChart(xbar, se, lower, upper) {
+            const ctx = document.getElementById('ciChart').getContext('2d');
+            
+            if (ciChart) {
+                ciChart.destroy();
+            }
+
+            const range = 4 * se;
+            const minX = xbar - range;
+            const maxX = xbar + range;
+            const points = 300;
+            const step = (maxX - minX) / points;
+
+            const labels = [];
+            const dataNormal = [];
+            const dataCI = [];
+
+            for (let i = 0; i <= points; i++) {
+                const x = minX + i * step;
+                labels.push(x.toFixed(2));
+                
+                const y = normalPDF(x, xbar, se);
+                dataNormal.push(y);
+                
+                if (x >= lower && x <= upper) {
+                    dataCI.push(y);
+                } else {
+                    dataCI.push(null);
+                }
+            }
+
+            ciChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Confidence Interval',
+                            data: dataCI,
+                            borderColor: '#8B0000',
+                            backgroundColor: 'rgba(139, 0, 0, 0.5)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            borderWidth: 2,
+                            order: 2
+                        },
+                        {
+                            label: 'Normal PDF (SE = S/√n)',
+                            data: dataNormal,
+                            borderColor: '#ff6b6b',
+                            backgroundColor: 'rgba(255, 107, 107, 0.05)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            borderWidth: 2,
+                            order: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ff6b6b',
+                            bodyColor: '#e5e5e5',
+                            borderColor: '#8B0000',
+                            borderWidth: 1,
+                            callbacks: {
+                                title: function(context) {
+                                    return 'μ = ' + context[0].label;
+                                },
+                                label: function(context) {
+                                    if (context.datasetIndex === 0) {
+                                        return 'Inside Confidence Interval';
+                                    }
+                                    return 'Density: ' + context.parsed.y.toFixed(4);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { 
+                                display: true, 
+                                text: 'μ (Population Mean)', 
+                                color: '#e5e5e5',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            ticks: { 
+                                color: '#e5e5e5',
+                                maxTicksLimit: 10
+                            },
+                            grid: { 
+                                color: 'rgba(139, 0, 0, 0.1)' 
+                            }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'Probability Density', 
+                                color: '#e5e5e5',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            ticks: { 
+                                color: '#e5e5e5' 
+                            },
+                            grid: { 
+                                color: 'rgba(139, 0, 0, 0.1)' 
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                },
+                plugins: [{
+                    afterDraw: function(chart) {
+                        const ctx = chart.ctx;
+                        const xAxis = chart.scales.x;
+                        const yAxis = chart.scales.y;
+                        
+                        // Draw mean line
+                        const xPixel = xAxis.getPixelForValue(xbar.toFixed(2));
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.moveTo(xPixel, yAxis.top);
+                        ctx.lineTo(xPixel, yAxis.bottom);
+                        ctx.lineWidth = 2;
+                        ctx.strokeStyle = '#ffd700';
+                        ctx.setLineDash([5, 5]);
+                        ctx.stroke();
+                        
+                        // Label for mean
+                        ctx.fillStyle = '#ffd700';
+                        ctx.font = 'bold 14px Inter';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('X̄ = ' + xbar, xPixel, yAxis.top - 10);
+                        ctx.restore();
+                        
+                        // Draw boundary lines
+                        [lower, upper].forEach(bound => {
+                            const xPix = xAxis.getPixelForValue(bound.toFixed(2));
+                            ctx.save();
+                            ctx.beginPath();
+                            ctx.moveTo(xPix, yAxis.top);
+                            ctx.lineTo(xPix, yAxis.bottom);
+                            ctx.lineWidth = 2;
+                            ctx.strokeStyle = '#ff4444';
+                            ctx.setLineDash([3, 3]);
+                            ctx.stroke();
+                            
+                            ctx.fillStyle = '#ff4444';
+                            ctx.font = '12px Inter';
+                            ctx.textAlign = 'center';
+                            ctx.fillText(bound.toFixed(2), xPix, yAxis.bottom + 20);
+                            ctx.restore();
+                        });
+                    }
+                }]
+            });
+        }
+
+        function normalPDF(x, mu, sigma) {
+            return (1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mu) / sigma, 2));
         }
     </script>
+
 </body>
 </html>
